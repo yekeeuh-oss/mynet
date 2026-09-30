@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { isAdminPassword, siteConfig } from "@/lib/config";
-import { cssImage } from "@/lib/url";
 import { deleteMedia, mediaKeys } from "@/lib/media-db";
 import {
   getVisitorId,
@@ -11,6 +10,7 @@ import {
   saveGalleryPhotos,
   saveGalleryPrefs,
 } from "@/lib/gallery-store";
+import { diaryRefreshEvent, notifyDiaryRefresh } from "@/lib/events";
 import { readAdmin, saveAdmin } from "@/lib/storage";
 import { useResolvedAsset } from "@/lib/use-resolved-asset";
 import type { GalleryCategory, GalleryPhoto, GalleryPrefs } from "@/lib/types";
@@ -18,6 +18,7 @@ import { galleryCategories } from "@/lib/types";
 import { BackgroundDialog } from "@/components/console/background-dialog";
 import { PasswordDialog } from "@/components/console/password-dialog";
 import { primaryButtonClass } from "@/components/console/modal";
+import { PageBackdrop } from "@/components/console/page-backdrop";
 import { SiteNav } from "@/components/console/site-nav";
 import { GalleryCard } from "@/components/gallery/gallery-card";
 import { GalleryUpload } from "@/components/gallery/gallery-upload";
@@ -44,11 +45,16 @@ export function GalleryScreen() {
   const albumRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setPhotos(loadGalleryPhotos());
-    setPrefs(loadGalleryPrefs());
-    setAdmin(readAdmin());
-    setVisitorId(getVisitorId());
-    setReady(true);
+    function load() {
+      setPhotos(loadGalleryPhotos());
+      setPrefs(loadGalleryPrefs());
+      setAdmin(readAdmin());
+      setVisitorId(getVisitorId());
+      setReady(true);
+    }
+    load();
+    window.addEventListener(diaryRefreshEvent, load);
+    return () => window.removeEventListener(diaryRefreshEvent, load);
   }, []);
 
   const chosen =
@@ -58,6 +64,7 @@ export function GalleryScreen() {
   function commitPhotos(next: GalleryPhoto[]) {
     setPhotos(next);
     saveGalleryPhotos(next);
+    notifyDiaryRefresh();
   }
 
   function toggleLike(photoId: string) {
@@ -131,11 +138,7 @@ export function GalleryScreen() {
 
   return (
     <div className="relative min-h-screen text-[#241f1b]">
-      <div
-        aria-hidden="true"
-        className="fixed inset-0 bg-[#10241f] bg-cover bg-center transition-all duration-300"
-        style={{ backgroundImage: cssImage(resolved || siteConfig.defaultBackground) }}
-      />
+      <PageBackdrop image={resolved || siteConfig.defaultBackground} />
       <div
         className={`relative mx-auto w-full max-w-6xl px-4 pb-24 pt-16 transition-all duration-300 sm:px-6 ${
           ready ? "opacity-100" : "opacity-0"

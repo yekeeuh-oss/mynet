@@ -9,11 +9,12 @@ import { fieldClass, primaryButtonClass, quietButtonClass } from "@/components/c
 
 type GlassCardProps = {
   id: CardId;
+  anchorId?: string;
   className?: string;
   children: React.ReactNode;
 };
 
-export function GlassCard({ id, className, children }: GlassCardProps) {
+export function GlassCard({ id, anchorId, className, children }: GlassCardProps) {
   const { admin, settings, setCardSkin } = useConsole();
   const skin = settings.cards[id];
   const [open, setOpen] = useState(false);
@@ -68,7 +69,11 @@ export function GlassCard({ id, className, children }: GlassCardProps) {
   } as CSSProperties;
 
   return (
-    <div className={`relative h-full min-w-0 ${className ?? ""}`} data-card={id}>
+    <div
+      id={anchorId}
+      className={`relative h-full min-w-0 ${className ?? ""}`}
+      data-card={id}
+    >
       {hasImage ? (
         <>
           <div
@@ -83,7 +88,7 @@ export function GlassCard({ id, className, children }: GlassCardProps) {
       ) : null}
       <div
         style={tone}
-        className={`relative flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-white/20 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-2xl ${
+        className={`glass-shell relative flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-white/20 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-2xl ${
           hasImage ? "bg-white/15 text-[var(--fg)]" : "bg-white/60 text-[var(--fg)]"
         }`}
       >

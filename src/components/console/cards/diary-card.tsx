@@ -20,7 +20,11 @@ export function DiaryCard() {
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   return (
-    <GlassCard id="diary" className="min-h-[420px] md:col-span-2 lg:col-span-2 lg:row-span-2">
+    <GlassCard
+      id="diary"
+      anchorId="diary-hall"
+      className="min-h-[420px] md:col-span-2 lg:col-span-2 lg:row-span-2"
+    >
       <div className="flex shrink-0 items-start justify-between gap-3">
         <div>
           <p className="text-[11px] font-medium tracking-[0.22em] text-[var(--accent)]">

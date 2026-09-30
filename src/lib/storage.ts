@@ -31,6 +31,8 @@ export function defaultSettings(): Settings {
       profile: emptySkin(),
       notes: emptySkin(),
       vinyl: emptySkin(),
+      lore: emptySkin(),
+      playground: emptySkin(),
     },
     ambience: "rain",
     customAudioUrl: "",

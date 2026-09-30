@@ -2,7 +2,14 @@ import type { ambienceTracks } from "@/lib/config";
 
 export type AmbienceId = (typeof ambienceTracks)[number]["id"];
 
-export type CardId = "diary" | "calendar" | "profile" | "notes" | "vinyl";
+export type CardId =
+  | "diary"
+  | "calendar"
+  | "profile"
+  | "notes"
+  | "vinyl"
+  | "lore"
+  | "playground";
 
 export type CardSkin = {
   imageUrl: string;
@@ -69,10 +76,28 @@ export type Settings = {
   customAudioUrl: string;
 };
 
+export const loreCategories = ["角色设定", "Midjourney 提示词", "世界观随笔"] as const;
+
+export type LoreCategory = (typeof loreCategories)[number];
+
+export type LoreItem = {
+  id: string;
+  category: LoreCategory;
+  title: string;
+  summary: string;
+  prompt: string;
+  imageId: string;
+  createdAt: string;
+};
+
+export type ThemeMode = "dark" | "light";
+
 export const cardIds: CardId[] = [
   "diary",
   "calendar",
   "profile",
   "notes",
   "vinyl",
+  "lore",
+  "playground",
 ];

@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { siteConfig } from "@/lib/config";
-import { cssImage } from "@/lib/url";
 import { useResolvedAsset } from "@/lib/use-resolved-asset";
+import { ActivityGraph } from "@/components/console/activity-graph";
 import { AdminControls } from "@/components/console/admin-controls";
+import { PageBackdrop } from "@/components/console/page-backdrop";
 import { SiteNav } from "@/components/console/site-nav";
 import { CalendarCard } from "@/components/console/cards/calendar-card";
 import { DiaryCard } from "@/components/console/cards/diary-card";
+import { LoreCard } from "@/components/console/cards/lore-card";
 import { NotesCard } from "@/components/console/cards/notes-card";
+import { PlaygroundCard } from "@/components/console/cards/playground-card";
 import { ProfileCard } from "@/components/console/cards/profile-card";
 import { VinylCard } from "@/components/console/cards/vinyl-card";
 import { ConsoleProvider, useConsole } from "@/components/console/console-context";
@@ -49,11 +52,7 @@ function ConsoleScreen() {
 
   return (
     <div className="relative min-h-screen text-[#241f1b]">
-      <div
-        aria-hidden="true"
-        className="fixed inset-0 bg-[#10241f] bg-cover bg-center transition-all duration-300"
-        style={{ backgroundImage: cssImage(shown) }}
-      />
+      <PageBackdrop image={shown} />
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-24 pt-16 sm:px-6">
         <SiteNav />
         <div
@@ -65,8 +64,11 @@ function ConsoleScreen() {
           <DiaryCard />
           <CalendarCard />
           <VinylCard />
+          <PlaygroundCard />
+          <LoreCard />
           <NotesCard />
         </div>
+        <ActivityGraph />
       </div>
       <AdminControls
         secretSignal={secretSignal}

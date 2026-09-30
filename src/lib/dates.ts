@@ -1,3 +1,9 @@
+export function dayKeyFromDate(date: Date) {
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
 export function toDayKey(iso: string) {
   const date = new Date(iso);
   const month = `${date.getMonth() + 1}`.padStart(2, "0");

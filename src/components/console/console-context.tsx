@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { isAdminPassword } from "@/lib/config";
+import { diaryRefreshEvent } from "@/lib/events";
 import { deleteMedia } from "@/lib/media-db";
 import {
   defaultSettings,
@@ -68,6 +69,14 @@ export function ConsoleProvider({ children }: { children: React.ReactNode }) {
     setSettings(loaded.settings);
     setAdmin(loaded.admin);
     setReady(true);
+    function onRefresh() {
+      const next = loadConsole();
+      setEntries(next.entries);
+      setNotes(next.notes);
+      setSettings(next.settings);
+    }
+    window.addEventListener(diaryRefreshEvent, onRefresh);
+    return () => window.removeEventListener(diaryRefreshEvent, onRefresh);
   }, []);
 
   const addEntry = useCallback((input: NewEntry) => {
