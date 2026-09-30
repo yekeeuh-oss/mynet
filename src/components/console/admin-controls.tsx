@@ -1,15 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { siteConfig } from "@/lib/config";
-import { cssImage, sanitizeAssetUrl } from "@/lib/url";
+import { mediaKeys } from "@/lib/media-db";
 import { useConsole } from "@/components/console/console-context";
-import {
-  Modal,
-  fieldClass,
-  primaryButtonClass,
-  quietButtonClass,
-} from "@/components/console/modal";
+import { BackgroundDialog } from "@/components/console/background-dialog";
+import { PasswordDialog } from "@/components/console/password-dialog";
 
 type AdminControlsProps = {
   secretSignal: number;
@@ -92,174 +87,19 @@ export function AdminControls({
       ) : null}
       {backgroundOpen ? (
         <BackgroundDialog
-          initialUrl={settings.globalBackgroundUrl}
+          title="全局背景"
+          description="拖入本地图片，或在面板里按 Ctrl+V 粘贴，会立刻换成新壁纸并保存在这台浏览器。清除后回到默认壁纸。"
+          mediaId={mediaKeys.diaryBackground}
+          initialRef={settings.globalBackgroundUrl}
           onClose={() => {
             setBackgroundOpen(false);
             onLiveBackground(undefined);
           }}
           onPreview={onLiveBackground}
-          onSave={(url) => {
-            setGlobalBackground(url);
-            setBackgroundOpen(false);
-            onLiveBackground(undefined);
-          }}
+          onApply={setGlobalBackground}
         />
       ) : null}
     </>
-  );
-}
-
-function PasswordDialog({
-  onClose,
-  onUnlock,
-}: {
-  onClose: () => void;
-  onUnlock: (password: string) => boolean;
-}) {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
-  const [shake, setShake] = useState(0);
-
-  return (
-    <Modal
-      key={shake}
-      title="管理员验证"
-      onClose={onClose}
-      panelClassName={shake > 0 ? "animate-shake" : ""}
-    >
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          const ok = onUnlock(password);
-          if (!ok) {
-            setError(true);
-            setShake((value) => value + 1);
-            setPassword("");
-          }
-        }}
-      >
-        <p className="text-[11px] font-medium tracking-[0.22em] text-[#1E6B48]">
-          PRIVATE
-        </p>
-        <h2 className="mt-2 font-serif text-3xl">管理暗门</h2>
-        <p className="mt-3 text-sm leading-7 text-[#5c564e]">
-          只有正确口令能进入编辑模式。访客可以浏览和记录，不能改背景。
-        </p>
-        <label htmlFor="admin-password" className="mt-5 block text-xs text-[#5c564e]">
-          密码
-        </label>
-        <input
-          id="admin-password"
-          type="password"
-          autoFocus
-          autoComplete="off"
-          value={password}
-          onChange={(event) => {
-            setPassword(event.target.value);
-            setError(false);
-          }}
-          className={`${fieldClass} mt-1.5`}
-          placeholder="输入管理密码"
-        />
-        {error ? <p className="mt-2 text-sm text-red-700">密码不正确</p> : null}
-        <div className="mt-6 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className={quietButtonClass}>
-            取消
-          </button>
-          <button type="submit" className={primaryButtonClass}>
-            进入
-          </button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
-
-function BackgroundDialog({
-  initialUrl,
-  onClose,
-  onPreview,
-  onSave,
-}: {
-  initialUrl: string;
-  onClose: () => void;
-  onPreview: (url: string | undefined) => void;
-  onSave: (url: string) => void;
-}) {
-  const [draft, setDraft] = useState(initialUrl);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const trimmed = draft.trim();
-    if (!trimmed) {
-      setError("");
-      onPreview("");
-      return;
-    }
-    const safe = sanitizeAssetUrl(trimmed);
-    if (!safe) {
-      setError("请输入 http(s) 图片地址，或以 / 开头的站内路径。");
-      return;
-    }
-    setError("");
-    onPreview(safe);
-  }, [draft, onPreview]);
-
-  return (
-    <Modal title="更换全局背景" onClose={onClose}>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          const trimmed = draft.trim();
-          if (!trimmed) {
-            onSave("");
-            return;
-          }
-          const safe = sanitizeAssetUrl(trimmed);
-          if (!safe) {
-            setError("请输入 http(s) 图片地址，或以 / 开头的站内路径。");
-            return;
-          }
-          onSave(safe);
-        }}
-      >
-        <p className="text-[11px] font-medium tracking-[0.22em] text-[#1E6B48]">
-          WALLPAPER
-        </p>
-        <h2 className="mt-2 font-serif text-3xl">全局背景</h2>
-        <p className="mt-3 text-sm leading-7 text-[#5c564e]">
-          输入图片地址会立刻预览。保存后写入这台浏览器。留空则回到默认壁纸。
-        </p>
-        <label htmlFor="background-url" className="mt-5 block text-xs text-[#5c564e]">
-          图片 URL
-        </label>
-        <input
-          id="background-url"
-          value={draft}
-          spellCheck={false}
-          onChange={(event) => setDraft(event.target.value)}
-          placeholder={siteConfig.defaultBackground}
-          className={`${fieldClass} mt-1.5`}
-        />
-        <div
-          className="mt-3 h-28 rounded-2xl border border-black/10 bg-cover bg-center"
-          style={{
-            backgroundImage: cssImage(
-              sanitizeAssetUrl(draft) || siteConfig.defaultBackground,
-            ),
-          }}
-        />
-        {error ? <p className="mt-2 text-sm text-red-700">{error}</p> : null}
-        <div className="mt-6 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className={quietButtonClass}>
-            取消
-          </button>
-          <button type="submit" className={primaryButtonClass}>
-            保存
-          </button>
-        </div>
-      </form>
-    </Modal>
   );
 }
 

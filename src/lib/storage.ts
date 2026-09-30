@@ -79,6 +79,11 @@ function parseEntries(value: unknown): DiaryEntry[] {
     ) {
       return [];
     }
+    const images = Array.isArray(item.images)
+      ? item.images
+          .filter((image): image is string => typeof image === "string")
+          .slice(0, 3)
+      : [];
     return [
       {
         id: item.id,
@@ -86,6 +91,7 @@ function parseEntries(value: unknown): DiaryEntry[] {
         content: item.content,
         mood: item.mood,
         createdAt: item.createdAt,
+        images,
       },
     ];
   });
@@ -154,6 +160,7 @@ function seedEntries(): DiaryEntry[] {
         "今天的风很轻。我把早晨的茶、未回的信，和那一小段突然安静下来的时间，都折进这一页。",
       mood: "🌿",
       createdAt: daysAgo(1),
+      images: [],
     },
     {
       id: "seed-soup",
@@ -161,6 +168,7 @@ function seedEntries(): DiaryEntry[] {
       content: "火开得很小。葱花最后才落下，像一句迟到、但刚好赶上的话。",
       mood: "☕️",
       createdAt: daysAgo(3),
+      images: [],
     },
     {
       id: "seed-train",
@@ -168,6 +176,7 @@ function seedEntries(): DiaryEntry[] {
       content: "城市一格一格往后移。我把没说完的句子，留到了下一站。",
       mood: "🌙",
       createdAt: daysAgo(6),
+      images: [],
     },
   ];
 }
@@ -197,9 +206,12 @@ export function loadConsole() {
   if (noteRaw === null) writeRaw(keys.notes, JSON.stringify(notes));
 
   const settings = parseSettings(parseJson(readRaw(keys.settings)));
+  return { entries, notes, settings, admin: readAdmin() };
+}
+
+export function readAdmin() {
   const adminRecord = parseJson(readRaw(keys.admin));
-  const admin = isRecord(adminRecord) && adminRecord.unlocked === true;
-  return { entries, notes, settings, admin };
+  return isRecord(adminRecord) && adminRecord.unlocked === true;
 }
 
 export function saveEntries(entries: DiaryEntry[]) {

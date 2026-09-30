@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { isAdminPassword } from "@/lib/config";
+import { deleteMedia } from "@/lib/media-db";
 import {
   defaultSettings,
   loadConsole,
@@ -30,6 +31,7 @@ type NewEntry = {
   title: string;
   content: string;
   mood: string;
+  images?: string[];
 };
 
 type ConsoleContextValue = {
@@ -75,6 +77,7 @@ export function ConsoleProvider({ children }: { children: React.ReactNode }) {
       content: input.content.trim(),
       mood: input.mood,
       createdAt: new Date().toISOString(),
+      images: (input.images ?? []).slice(0, 3),
     };
     setEntries((current) => {
       const next = [entry, ...current].slice(0, 100);
@@ -87,6 +90,10 @@ export function ConsoleProvider({ children }: { children: React.ReactNode }) {
     (id: string) => {
       if (!admin) return;
       setEntries((current) => {
+        const target = current.find((entry) => entry.id === id);
+        target?.images.forEach((mediaId) => {
+          void deleteMedia(mediaId);
+        });
         const next = current.filter((entry) => entry.id !== id);
         saveEntries(next);
         return next;

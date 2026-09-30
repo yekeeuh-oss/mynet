@@ -8,9 +8,16 @@ type ModalProps = {
   onClose: () => void;
   children: React.ReactNode;
   panelClassName?: string;
+  wide?: boolean;
 };
 
-export function Modal({ title, onClose, children, panelClassName }: ModalProps) {
+export function Modal({
+  title,
+  onClose,
+  children,
+  panelClassName,
+  wide = false,
+}: ModalProps) {
   const onCloseRef = useRef(onClose);
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -42,7 +49,7 @@ export function Modal({ title, onClose, children, panelClassName }: ModalProps) 
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`w-full max-w-md rounded-3xl border border-white/20 bg-white/80 p-6 text-[#241f1b] shadow-2xl backdrop-blur-md transition-all duration-300 ${panelClassName ?? ""}`}
+        className={`w-full rounded-3xl border border-white/20 bg-white/80 p-6 text-[#241f1b] shadow-2xl backdrop-blur-md transition-all duration-300 ${wide ? "max-h-[85vh] max-w-lg overflow-y-auto" : "max-w-md"} ${panelClassName ?? ""}`}
         onMouseDown={(event) => event.stopPropagation()}
       >
         {children}

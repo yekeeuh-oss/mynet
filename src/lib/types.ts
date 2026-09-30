@@ -15,6 +15,45 @@ export type DiaryEntry = {
   content: string;
   mood: string;
   createdAt: string;
+  images: string[];
+};
+
+export const galleryCategories = ["生活", "灵感", "创作"] as const;
+
+export type GalleryCategory = (typeof galleryCategories)[number];
+
+export type CaptionFont = "sans" | "serif" | "script";
+
+export type GalleryLike = {
+  id: string;
+  visitorId: string;
+  createdAt: string;
+};
+
+export type GalleryComment = {
+  id: string;
+  nickname: string;
+  content: string;
+  createdAt: string;
+};
+
+export type GalleryPhoto = {
+  id: string;
+  mediaId: string;
+  caption: string;
+  color: string;
+  font: CaptionFont;
+  category: GalleryCategory;
+  createdAt: string;
+  likes: GalleryLike[];
+  comments: GalleryComment[];
+};
+
+export type GalleryPrefs = {
+  saveAsDefault: boolean;
+  color: string;
+  font: CaptionFont;
+  backgroundRef: string;
 };
 
 export type QuickNote = {

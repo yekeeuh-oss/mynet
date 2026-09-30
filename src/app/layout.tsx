@@ -14,7 +14,17 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "纸间 · 个人日记",
-  description: "磨砂玻璃便当盒上的私人日记与控制台。",
+  description: "磨砂玻璃便当盒上的私人日记与光影画廊。",
+  applicationName: "纸间",
+  appleWebApp: {
+    capable: true,
+    title: "纸间",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon-192.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
