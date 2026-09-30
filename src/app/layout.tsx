@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "纸间 · 个人日记",
-  description: "一卷暖白纸页上的私人日记。",
+  description: "磨砂玻璃便当盒上的私人日记与控制台。",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
