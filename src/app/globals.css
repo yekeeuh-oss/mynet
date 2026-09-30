@@ -10,6 +10,26 @@
   --foreground: #f7f4ef;
 }
 
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes seal-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(156 59 50 / 0.28);
+  }
+  50% {
+    box-shadow: 0 0 18px 4px rgb(156 59 50 / 0.45);
+  }
+}
+
 @keyframes shake {
   0%,
   100% {

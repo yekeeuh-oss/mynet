@@ -9,7 +9,10 @@ export type CardId =
   | "notes"
   | "vinyl"
   | "lore"
-  | "playground";
+  | "playground"
+  | "oracle"
+  | "capsule"
+  | "radar";
 
 export type CardSkin = {
   imageUrl: string;
@@ -100,4 +103,7 @@ export const cardIds: CardId[] = [
   "vinyl",
   "lore",
   "playground",
+  "oracle",
+  "capsule",
+  "radar",
 ];
