@@ -97,6 +97,7 @@ function parseEntries(value: unknown): DiaryEntry[] {
         mood: item.mood,
         createdAt: item.createdAt,
         images,
+        font: typeof item.font === "string" ? item.font : "serif",
       },
     ];
   });
@@ -166,6 +167,7 @@ function seedEntries(): DiaryEntry[] {
       mood: "🌿",
       createdAt: daysAgo(1),
       images: [],
+      font: "serif",
     },
     {
       id: "seed-soup",
@@ -174,6 +176,7 @@ function seedEntries(): DiaryEntry[] {
       mood: "☕️",
       createdAt: daysAgo(3),
       images: [],
+      font: "serif",
     },
     {
       id: "seed-train",
@@ -182,6 +185,7 @@ function seedEntries(): DiaryEntry[] {
       mood: "🌙",
       createdAt: daysAgo(6),
       images: [],
+      font: "serif",
     },
   ];
 }

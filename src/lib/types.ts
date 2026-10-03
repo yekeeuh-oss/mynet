@@ -27,6 +27,7 @@ export type DiaryEntry = {
   mood: string;
   createdAt: string;
   images: string[];
+  font: string;
 };
 
 export const galleryCategories = ["生活", "灵感", "创作"] as const;

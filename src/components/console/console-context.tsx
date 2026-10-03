@@ -33,6 +33,7 @@ type NewEntry = {
   content: string;
   mood: string;
   images?: string[];
+  font?: string;
 };
 
 type ConsoleContextValue = {
@@ -87,6 +88,7 @@ export function ConsoleProvider({ children }: { children: React.ReactNode }) {
       mood: input.mood,
       createdAt: new Date().toISOString(),
       images: (input.images ?? []).slice(0, 3),
+      font: input.font || "serif",
     };
     setEntries((current) => {
       const next = [entry, ...current].slice(0, 100);

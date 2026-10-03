@@ -159,7 +159,7 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
   function saveUrl() {
     const trimmed = draftUrl.trim();
     if (!trimmed) {
-      void clearSkin();
+      void resetSkin();
       return;
     }
     const safe = sanitizeAssetUrl(trimmed);
@@ -173,13 +173,15 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
     setOpen(false);
   }
 
-  async function clearSkin() {
+  async function resetSkin() {
     await deleteMedia(cardSkinMediaId(id));
     imageRef.current = "";
     setLiveImage("");
     setDraftUrl("");
+    setDraftOpacity(0.4);
+    setDraftFrame(false);
     setResolvedImage("");
-    setCardSkin(id, { imageUrl: "", opacity: draftOpacity, hideFrame: draftFrame });
+    setCardSkin(id, { imageUrl: "", opacity: 0.4, hideFrame: false });
     setOpen(false);
   }
 
@@ -301,15 +303,32 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
             </button>
             <button
               type="button"
-              className={`${quietButtonClass} h-9 text-xs text-white/80 hover:bg-white/10`}
-              onClick={() => void clearSkin()}
+              className={`${quietButtonClass} h-9 items-center text-xs text-white/80 hover:bg-white/10`}
+              aria-label="重置"
+              onClick={() => void resetSkin()}
             >
-              清除背景
+              <ResetIcon />
+              重置
             </button>
           </div>
         </form>
       ) : null}
     </div>
+  );
+}
+
+function ResetIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="mr-1">
+      <path
+        d="M2 6a4 4 0 1 0 1.1-2.7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <path d="M2 1.8V4.2h2.4" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
