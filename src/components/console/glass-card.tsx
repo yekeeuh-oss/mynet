@@ -31,6 +31,7 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
   const [open, setOpen] = useState(false);
   const [draftUrl, setDraftUrl] = useState(skin.imageUrl);
   const [draftOpacity, setDraftOpacity] = useState(skin.opacity);
+  const [draftFrame, setDraftFrame] = useState(skin.hideFrame === true);
   const [resolvedImage, setResolvedImage] = useState("");
   const [liveImage, setLiveImage] = useState("");
   const [error, setError] = useState("");
@@ -41,6 +42,8 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
   imageRef.current = skin.imageUrl;
 
   const transparency = open ? draftOpacity : skin.opacity;
+  const hideFrame = open ? draftFrame : skin.hideFrame === true;
+  const clear = transparency >= 0.999;
   const whiteAlpha = 1 - transparency;
 
   useEffect(() => {
@@ -85,16 +88,15 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
     "--accent": accent,
     "--chip": foreground === "#241f1b" ? "rgba(36,31,27,0.06)" : "rgba(255,255,255,0.14)",
     "--line": foreground === "#241f1b" ? "rgba(36,31,27,0.12)" : "rgba(255,255,255,0.22)",
-    backgroundColor: `rgba(255, 255, 255, ${whiteAlpha})`,
-    textShadow:
-      whiteAlpha < 0.55 || hasImage
-        ? "0 1px 2px rgba(0,0,0,0.55), 0 0 1px rgba(255,255,255,0.35)"
-        : "none",
+    backgroundColor: clear ? "rgba(0, 0, 0, 0)" : `rgba(255, 255, 255, ${whiteAlpha})`,
+    borderColor: hideFrame ? "transparent" : clear ? "rgba(255, 255, 255, 0.16)" : undefined,
+    boxShadow: hideFrame ? "none" : clear ? "0 0 12px rgba(255, 255, 255, 0.14)" : undefined,
   } as CSSProperties;
 
   function openEditor() {
     setDraftUrl(skin.imageUrl.startsWith("idb:") || skin.imageUrl.startsWith("data:") ? "" : skin.imageUrl);
     setDraftOpacity(skin.opacity);
+    setDraftFrame(skin.hideFrame === true);
     setError("");
     setOpen(true);
   }
@@ -110,7 +112,7 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
       imageRef.current = reference;
       setLiveImage(dataUrl);
       setDraftUrl("");
-      setCardSkin(id, { imageUrl: reference, opacity: draftOpacity });
+      setCardSkin(id, { imageUrl: reference, opacity: draftOpacity, hideFrame: draftFrame });
     } catch (reason) {
       setError(
         reason instanceof Error && reason.message === "too-large"
@@ -138,7 +140,20 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
 
   function commitOpacity(value: number) {
     setDraftOpacity(value);
-    setCardSkin(id, { imageUrl: imageRef.current, opacity: value });
+    setCardSkin(id, {
+      imageUrl: imageRef.current,
+      opacity: value,
+      hideFrame: draftFrame,
+    });
+  }
+
+  function commitFrame(hidden: boolean) {
+    setDraftFrame(hidden);
+    setCardSkin(id, {
+      imageUrl: imageRef.current,
+      opacity: draftOpacity,
+      hideFrame: hidden,
+    });
   }
 
   function saveUrl() {
@@ -154,7 +169,7 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
     }
     imageRef.current = safe;
     setLiveImage("");
-    setCardSkin(id, { imageUrl: safe, opacity: draftOpacity });
+    setCardSkin(id, { imageUrl: safe, opacity: draftOpacity, hideFrame: draftFrame });
     setOpen(false);
   }
 
@@ -164,7 +179,7 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
     setLiveImage("");
     setDraftUrl("");
     setResolvedImage("");
-    setCardSkin(id, { imageUrl: "", opacity: draftOpacity });
+    setCardSkin(id, { imageUrl: "", opacity: draftOpacity, hideFrame: draftFrame });
     setOpen(false);
   }
 
@@ -182,7 +197,9 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
       ) : null}
       <div
         style={tone}
-        className="glass-shell relative flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-white/20 text-[var(--fg)] shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-2xl"
+        className={`card-face glass-shell relative flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border text-[var(--fg)] transition-all duration-300 ${
+          hideFrame || clear ? "border-transparent" : "border-white/20 shadow-lg hover:shadow-2xl"
+        }`}
       >
         {admin ? (
           <button
@@ -200,7 +217,7 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
       </div>
       {open ? (
         <form
-          className="absolute right-3 top-14 z-30 w-72 rounded-2xl border border-white/20 bg-[#1c1917]/88 p-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300"
+          className="absolute right-3 top-14 z-30 w-72 rounded-2xl border border-white/20 bg-[#1c1917]/92 p-3 text-white shadow-2xl transition-all duration-300"
           onSubmit={(event) => {
             event.preventDefault();
             saveUrl();
@@ -267,7 +284,16 @@ export function GlassCard({ id, anchorId, className, children }: GlassCardProps)
               className="mt-1 w-full accent-[#1E6B48]"
             />
           </label>
-          <p className="mt-1 text-[11px] leading-5 text-white/55">100% 时卡片底色完全透出页面背景。</p>
+          <p className="mt-1 text-[11px] leading-5 text-white/55">
+            100% 时底色完全透明，壁纸保持清晰。
+          </p>
+          <button
+            type="button"
+            onClick={() => commitFrame(!hideFrame)}
+            className={`${quietButtonClass} mt-2 h-9 w-full text-xs text-white/80 hover:bg-white/10`}
+          >
+            {hideFrame ? "显示边框" : "隐藏边框"}
+          </button>
           {error ? <p className="mt-2 text-xs text-red-200">{error}</p> : null}
           <div className="mt-3 flex gap-2">
             <button type="submit" className={`${primaryButtonClass} h-9 px-3 text-xs`}>

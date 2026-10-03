@@ -17,6 +17,7 @@ export type CardId =
 export type CardSkin = {
   imageUrl: string;
   opacity: number;
+  hideFrame?: boolean;
 };
 
 export type DiaryEntry = {

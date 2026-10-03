@@ -145,7 +145,7 @@ export function GalleryScreen() {
         }`}
       >
         <SiteNav />
-        <header className="mb-5 rounded-3xl border border-white/20 bg-white/60 p-5 shadow-lg backdrop-blur-md">
+        <header className="card-face mb-5 rounded-3xl border border-white/20 bg-white/60 p-5 shadow-lg">
           <p className="text-[11px] font-medium tracking-[0.22em] text-[#1E6B48]">
             GALLERY
           </p>
@@ -190,13 +190,13 @@ export function GalleryScreen() {
           </div>
         </header>
         {groups.length === 0 ? (
-          <p className="rounded-3xl border border-white/20 bg-white/60 px-5 py-10 text-center text-sm leading-7 text-[#5c564e] shadow-lg backdrop-blur-md">
+          <p className="card-face rounded-3xl border border-white/20 bg-white/60 px-5 py-10 text-center text-sm leading-7 text-[#5c564e] shadow-lg">
             画廊还是空的。拍下一张，或从相册挑一张进来。
           </p>
         ) : (
           groups.map((group, index) => (
             <details key={group.key} open={index === 0} className="mb-6">
-              <summary className="mb-3 inline-flex cursor-pointer rounded-full border border-white/20 bg-white/60 px-4 py-2 text-sm text-[#241f1b] shadow-lg backdrop-blur-md">
+              <summary className="card-face mb-3 inline-flex cursor-pointer rounded-full border border-white/20 bg-white/60 px-4 py-2 text-sm text-[#241f1b] shadow-lg">
                 {group.label} · {group.photos.length} 张
               </summary>
               <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">

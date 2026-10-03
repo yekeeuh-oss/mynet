@@ -43,7 +43,7 @@ export function ActivityGraph() {
   const cells = buildYearCells(year, counts);
 
   return (
-    <section className="glass-shell mt-4 rounded-3xl border border-white/20 bg-white/60 p-5 text-[#241f1b] shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-2xl">
+    <section className="card-face glass-shell mt-4 rounded-3xl border border-white/20 bg-white/60 p-5 text-[#241f1b] shadow-lg transition-all duration-300 hover:shadow-2xl">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-[11px] font-medium tracking-[0.22em] text-[#1E6B48]">YEAR</p>
@@ -112,7 +112,7 @@ export function ActivityGraph() {
       </div>
       {tip ? (
         <div
-          className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-xl border border-white/20 bg-[#1c1917]/85 px-2.5 py-1.5 text-xs text-white shadow-lg backdrop-blur-md"
+          className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-xl border border-white/20 bg-[#1c1917]/85 px-2.5 py-1.5 text-xs text-white shadow-lg"
           style={{ left: tip.x, top: tip.y - 10 }}
         >
           {tip.text}

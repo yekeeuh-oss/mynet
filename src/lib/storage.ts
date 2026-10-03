@@ -19,7 +19,7 @@ const keys = {
 const ambienceIds: AmbienceId[] = ["rain", "hearth", "tide", "link"];
 
 function emptySkin(): CardSkin {
-  return { imageUrl: "", opacity: 0.4 };
+  return { imageUrl: "", opacity: 0.4, hideFrame: false };
 }
 
 export function defaultSettings(): Settings {
@@ -125,7 +125,7 @@ function parseSkin(value: unknown): CardSkin {
       ? Math.min(1, Math.max(0, value.opacity))
       : fallback.opacity;
   const imageUrl = typeof value.imageUrl === "string" ? value.imageUrl : "";
-  return { imageUrl, opacity };
+  return { imageUrl, opacity, hideFrame: value.hideFrame === true };
 }
 
 function parseSettings(value: unknown): Settings {

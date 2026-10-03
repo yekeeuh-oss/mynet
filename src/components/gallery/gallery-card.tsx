@@ -48,7 +48,7 @@ export function GalleryCard({
   }, [photo.mediaId]);
 
   return (
-    <article className="mb-4 break-inside-avoid overflow-hidden rounded-3xl border border-white/20 bg-white/60 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-2xl">
+    <article className="card-face mb-4 break-inside-avoid overflow-hidden rounded-3xl border border-white/20 bg-white/60 shadow-lg transition-all duration-300 hover:shadow-2xl">
       <div className="relative">
         {source ? (
           <img src={source} alt={photo.caption || "画廊照片"} className="w-full" />

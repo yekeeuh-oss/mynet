@@ -1,5 +1,9 @@
 import { BentoDashboard } from "@/components/console/bento-dashboard";
 
 export default function Home() {
-  return <BentoDashboard />;
+  return (
+    <div className="wallpaper-clear">
+      <BentoDashboard />
+    </div>
+  );
 }

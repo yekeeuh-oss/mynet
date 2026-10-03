@@ -62,7 +62,19 @@
 
 [data-theme="light"] .glass-shell {
   border-color: rgb(36 31 27 / 0.12);
-  background-color: rgb(255 255 255 / 0.82);
+}
+
+.card-face {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.card-face :where(h1, h2, h3, p, span, a, button, label, li, summary) {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.card-face svg:not([role="img"]) {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
 }
 
 body {
