@@ -57,8 +57,9 @@ function readRaw(key: string) {
 function writeRaw(key: string, value: string) {
   try {
     localStorage.setItem(key, value);
+    return true;
   } catch {
-    /* Ignore quota and private-mode failures. */
+    return false;
   }
 }
 
@@ -232,7 +233,7 @@ export function saveNotes(notes: QuickNote[]) {
 }
 
 export function saveSettings(settings: Settings) {
-  writeRaw(keys.settings, JSON.stringify(settings));
+  return writeRaw(keys.settings, JSON.stringify(settings));
 }
 
 export function saveAdmin(unlocked: boolean) {

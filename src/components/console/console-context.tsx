@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { isAdminPassword } from "@/lib/config";
@@ -47,7 +48,7 @@ type ConsoleContextValue = {
   addNote: (text: string) => void;
   removeNote: (id: string) => void;
   setGlobalBackground: (url: string) => void;
-  setCardSkin: (id: CardId, skin: CardSkin) => void;
+  setCardSkin: (id: CardId, skin: CardSkin) => boolean;
   setAmbience: (id: AmbienceId) => void;
   setCustomAudioUrl: (url: string) => void;
   unlock: (password: string) => boolean;
@@ -62,6 +63,8 @@ export function ConsoleProvider({ children }: { children: React.ReactNode }) {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [notes, setNotes] = useState<QuickNote[]>([]);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
 
   useEffect(() => {
     const loaded = loadConsole();
@@ -146,20 +149,16 @@ export function ConsoleProvider({ children }: { children: React.ReactNode }) {
     [admin],
   );
 
-  const setCardSkin = useCallback(
-    (id: CardId, skin: CardSkin) => {
-      if (!admin) return;
-      setSettings((current) => {
-        const next = {
-          ...current,
-          cards: { ...current.cards, [id]: skin },
-        };
-        saveSettings(next);
-        return next;
-      });
-    },
-    [admin],
-  );
+  const setCardSkin = useCallback((id: CardId, skin: CardSkin) => {
+    const next = {
+      ...settingsRef.current,
+      cards: { ...settingsRef.current.cards, [id]: skin },
+    };
+    if (!saveSettings(next)) return false;
+    settingsRef.current = next;
+    setSettings(next);
+    return true;
+  }, []);
 
   const setAmbience = useCallback((id: AmbienceId) => {
     setSettings((current) => {
