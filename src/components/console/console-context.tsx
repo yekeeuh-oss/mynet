@@ -35,6 +35,10 @@ type NewEntry = {
   mood: string;
   images?: string[];
   font?: string;
+  color?: string;
+  size?: "md" | "lg";
+  bold?: boolean;
+  italic?: boolean;
 };
 
 type ConsoleContextValue = {
@@ -92,6 +96,10 @@ export function ConsoleProvider({ children }: { children: React.ReactNode }) {
       createdAt: new Date().toISOString(),
       images: (input.images ?? []).slice(0, 3),
       font: input.font || "serif",
+      color: input.color || "#2C2825",
+      size: input.size === "lg" ? "lg" : "md",
+      bold: input.bold === true,
+      italic: input.italic === true,
     };
     setEntries((current) => {
       const next = [entry, ...current].slice(0, 100);

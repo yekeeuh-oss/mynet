@@ -1,4 +1,5 @@
 import { siteConfig } from "@/lib/config";
+import { readPassageStyle } from "@/lib/passage-style";
 import type {
   AmbienceId,
   CardId,
@@ -90,6 +91,7 @@ function parseEntries(value: unknown): DiaryEntry[] {
           .filter((image): image is string => typeof image === "string")
           .slice(0, 3)
       : [];
+    const style = readPassageStyle(item);
     return [
       {
         id: item.id,
@@ -98,7 +100,7 @@ function parseEntries(value: unknown): DiaryEntry[] {
         mood: item.mood,
         createdAt: item.createdAt,
         images,
-        font: typeof item.font === "string" ? item.font : "serif",
+        ...style,
       },
     ];
   });
@@ -169,6 +171,10 @@ function seedEntries(): DiaryEntry[] {
       createdAt: daysAgo(1),
       images: [],
       font: "serif",
+      color: "#2C2825",
+      size: "md",
+      bold: false,
+      italic: false,
     },
     {
       id: "seed-soup",
@@ -178,6 +184,10 @@ function seedEntries(): DiaryEntry[] {
       createdAt: daysAgo(3),
       images: [],
       font: "serif",
+      color: "#2C2825",
+      size: "md",
+      bold: false,
+      italic: false,
     },
     {
       id: "seed-train",
@@ -187,6 +197,10 @@ function seedEntries(): DiaryEntry[] {
       createdAt: daysAgo(6),
       images: [],
       font: "serif",
+      color: "#2C2825",
+      size: "md",
+      bold: false,
+      italic: false,
     },
   ];
 }

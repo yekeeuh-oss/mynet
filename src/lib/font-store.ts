@@ -53,6 +53,7 @@ function saveDiaryFonts(fonts: DiaryFont[]) {
 
 export function fontFamilyFor(fontId: string, fonts: DiaryFont[]) {
   if (fontId === "sans") return "var(--font-sans), sans-serif";
+  if (fontId === "script") return '"Ma Shan Zheng", "Segoe Script", cursive';
   if (fontId === "serif" || !fontId) return "var(--font-serif), serif";
   const match = fonts.find((font) => font.id === fontId);
   return match ? `"${match.family}", serif` : "var(--font-serif), serif";

@@ -28,6 +28,10 @@ export type DiaryEntry = {
   createdAt: string;
   images: string[];
   font: string;
+  color: string;
+  size: "md" | "lg";
+  bold: boolean;
+  italic: boolean;
 };
 
 export const galleryCategories = ["生活", "灵感", "创作"] as const;
@@ -81,18 +85,18 @@ export type Settings = {
   customAudioUrl: string;
 };
 
-export const loreCategories = ["角色设定", "Midjourney 提示词", "世界观随笔"] as const;
-
-export type LoreCategory = (typeof loreCategories)[number];
-
 export type LoreItem = {
   id: string;
-  category: LoreCategory;
+  category: string;
   title: string;
-  summary: string;
   prompt: string;
   imageId: string;
   createdAt: string;
+  font: string;
+  color: string;
+  size: "md" | "lg";
+  bold: boolean;
+  italic: boolean;
 };
 
 export type ThemeMode = "dark" | "light";
