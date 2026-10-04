@@ -36,7 +36,6 @@ export function defaultSettings(): Settings {
       playground: emptySkin(),
       oracle: emptySkin(),
       capsule: emptySkin(),
-      radar: emptySkin(),
     },
     ambience: "rain",
     customAudioUrl: "",

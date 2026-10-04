@@ -14,7 +14,6 @@ import { NotesCard } from "@/components/console/cards/notes-card";
 import { OracleCard } from "@/components/console/cards/oracle-card";
 import { PlaygroundCard } from "@/components/console/cards/playground-card";
 import { ProfileCard } from "@/components/console/cards/profile-card";
-import { RadarCard } from "@/components/console/cards/radar-card";
 import { CapsuleCard } from "@/components/console/cards/capsule-card";
 import { VinylCard } from "@/components/console/cards/vinyl-card";
 import { ConsoleProvider, useConsole } from "@/components/console/console-context";
@@ -66,12 +65,11 @@ function ConsoleScreen() {
           <ProfileCard onSecret={() => setSecretSignal((value) => value + 1)} />
           <DiaryCard />
           <CalendarCard />
-          <VinylCard />
           <PlaygroundCard />
           <LoreCard />
           <OracleCard />
           <CapsuleCard />
-          <RadarCard />
+          <VinylCard />
           <NotesCard />
         </div>
         <ActivityGraph />

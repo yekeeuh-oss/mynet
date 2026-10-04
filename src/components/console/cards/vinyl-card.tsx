@@ -34,7 +34,6 @@ export function VinylCard() {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [error, setError] = useState("");
 
   tracksRef.current = tracks;
   modeRef.current = mode;
@@ -63,7 +62,7 @@ export function VinylCard() {
       if (modeRef.current === "single") {
         if (!audio) return;
         audio.currentTime = 0;
-        void audio.play();
+        void audio.play().catch(() => setPlaying(false));
         return;
       }
       if (list.length === 0) return;
@@ -96,40 +95,32 @@ export function VinylCard() {
     const audio = audioRef.current;
     if (!audio) return;
     const file = await getFile(id);
-    if (!file) {
-      setError("这首的文件找不到了。");
-      return;
-    }
+    if (!file) return;
     if (urlRef.current) URL.revokeObjectURL(urlRef.current);
     const url = URL.createObjectURL(file);
     urlRef.current = url;
     audio.src = url;
     setCurrentId(id);
     setProgress(0);
-    setError("");
     const next = {
       tracks: tracksRef.current,
       mode: modeRef.current,
       currentId: id,
     };
     savePlaylist(next);
-    if (autoplay) {
-      try {
-        await audio.play();
-        setPlaying(true);
-      } catch {
-        setPlaying(false);
-        setError("这首暂时无法播放。");
-      }
+    if (!autoplay) return;
+    try {
+      await audio.play();
+      setPlaying(true);
+    } catch (error) {
+      setPlaying(false);
+      if (error instanceof DOMException && error.name === "NotAllowedError") return;
     }
   }
 
   async function addFiles(list: FileList | null) {
     const files = [...(list ?? [])].filter(isAudioFile);
-    if (files.length === 0) {
-      setError("请选择 mp3、wav 或 flac 文件。");
-      return;
-    }
+    if (files.length === 0) return;
     const added: PlaylistTrack[] = [];
     for (const file of files) {
       const id = crypto.randomUUID();
@@ -142,7 +133,6 @@ export function VinylCard() {
     setTracks(nextTracks);
     setCurrentId(nextId);
     savePlaylist(next);
-    setError("");
     if (!currentRef.current && added[0]) await loadTrack(added[0].id, false);
   }
 
@@ -191,8 +181,9 @@ export function VinylCard() {
       try {
         await audio.play();
         setPlaying(true);
-      } catch {
-        setError("播放被浏览器拦住了。");
+      } catch (error) {
+        setPlaying(false);
+        if (error instanceof DOMException && error.name === "NotAllowedError") return;
       }
     } else {
       audio.pause();
@@ -209,7 +200,7 @@ export function VinylCard() {
   const current = tracks.find((track) => track.id === currentId);
 
   return (
-    <GlassCard id="vinyl" className="min-h-[320px] md:col-span-2 lg:col-span-1">
+    <GlassCard id="vinyl" className="min-h-[460px] md:col-span-2 lg:col-span-2">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[11px] font-medium tracking-[0.22em] text-[var(--accent)]">PLAYER</p>
@@ -237,8 +228,8 @@ export function VinylCard() {
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
       />
-      <div className="mt-3 flex items-center gap-2 text-xs tabular-nums text-[var(--muted)]">
-        <span>{formatTime(progress)}</span>
+      <div className="mt-5 flex flex-row flex-nowrap items-center gap-3 whitespace-nowrap text-xs tabular-nums text-[var(--muted)]">
+        <span className="w-10 shrink-0">{formatTime(progress)}</span>
         <input
           type="range"
           min={0}
@@ -257,16 +248,16 @@ export function VinylCard() {
             setProgress(value);
             if (audioRef.current) audioRef.current.currentTime = value;
           }}
-          className="w-full accent-[#1E6B48]"
+          className="min-w-0 flex-1 accent-[#1E6B48]"
         />
-        <span>{formatTime(duration)}</span>
+        <span className="w-10 shrink-0 text-right">{formatTime(duration)}</span>
       </div>
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-4 flex flex-row flex-nowrap items-center justify-center gap-2 whitespace-nowrap">
         <button type="button" aria-label="上一曲" onClick={() => step(-1)} className={controlClass}>
           <SkipIcon direction="prev" />
         </button>
-        <button type="button" aria-pressed={playing} onClick={() => void toggle()} className={controlClass}>
-          {playing ? "暂停" : "播放"}
+        <button type="button" aria-label={playing ? "暂停" : "播放"} aria-pressed={playing} onClick={() => void toggle()} className={controlClass}>
+          {playing ? <PauseIcon /> : <PlayIcon />}
         </button>
         <button type="button" aria-label="下一曲" onClick={() => step(1)} className={controlClass}>
           <SkipIcon direction="next" />
@@ -274,19 +265,19 @@ export function VinylCard() {
         <button
           type="button"
           aria-label={modeLabel(mode)}
+          title={modeLabel(mode)}
           onClick={cycleMode}
-          className="ml-auto inline-flex h-10 items-center gap-1.5 rounded-full bg-[var(--chip)] px-3 text-xs transition-all duration-300 hover:opacity-80"
+          className={`${controlClass} ml-2`}
         >
           <ModeIcon mode={mode} />
-          {modeLabel(mode)}
         </button>
       </div>
-      <ul className="mt-3 max-h-36 space-y-1 overflow-y-auto pr-1 text-sm">
+      <ul className="song-scroll mt-5 max-h-52 min-h-28 flex-1 space-y-1 overflow-y-auto text-sm">
         {tracks.length === 0 ? (
           <li className="text-[var(--muted)]">还没有歌曲。可一次选多首 mp3、wav 或 flac。</li>
         ) : (
           tracks.map((track) => (
-            <li key={track.id} className="flex items-center gap-2">
+            <li key={track.id} className="flex flex-row flex-nowrap items-center gap-3 whitespace-nowrap">
               <button
                 type="button"
                 onClick={() => void loadTrack(track.id, true)}
@@ -300,7 +291,7 @@ export function VinylCard() {
                 type="button"
                 aria-label={`移除 ${track.name}`}
                 onClick={() => void removeTrack(track.id)}
-                className="text-xs text-[var(--muted)] transition-all duration-300 hover:text-red-600"
+                className="ml-auto shrink-0 text-xs whitespace-nowrap text-[var(--muted)] transition-all duration-300 hover:text-red-600"
               >
                 移除
               </button>
@@ -308,13 +299,28 @@ export function VinylCard() {
           ))
         )}
       </ul>
-      {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
     </GlassCard>
   );
 }
 
 const controlClass =
-  "inline-flex h-10 items-center justify-center rounded-full bg-[var(--chip)] px-3 text-sm transition-all duration-300 hover:opacity-80";
+  "inline-flex h-10 w-10 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[var(--chip)] transition-all duration-300 hover:opacity-80";
+
+function PlayIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M5 3.2v9.6L13 8 5 3.2z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function PauseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M4 3h3v10H4zM9 3h3v10H9z" fill="currentColor" />
+    </svg>
+  );
+}
 
 function SkipIcon({ direction }: { direction: "prev" | "next" }) {
   const transform = direction === "prev" ? "scale(-1, 1)" : undefined;
