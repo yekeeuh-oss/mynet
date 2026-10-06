@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { deleteFile, getFile, putFile } from "@/lib/media-db";
 import {
   isAudioFile,
+  loadPlayerVolume,
   loadPlaylist,
   modeLabel,
   nextMode,
+  savePlayerVolume,
   savePlaylist,
   type PlayMode,
   type PlaylistTrack,
@@ -28,22 +30,31 @@ export function VinylCard() {
   const tracksRef = useRef<PlaylistTrack[]>([]);
   const modeRef = useRef<PlayMode>("order");
   const currentRef = useRef("");
+  const volumeRef = useRef(30);
   const [tracks, setTracks] = useState<PlaylistTrack[]>([]);
   const [currentId, setCurrentId] = useState("");
   const [mode, setMode] = useState<PlayMode>("order");
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(30);
+  const [muted, setMuted] = useState(false);
+  const rememberedVolume = useRef(30);
 
   tracksRef.current = tracks;
   modeRef.current = mode;
   currentRef.current = currentId;
+  volumeRef.current = muted ? 0 : volume;
 
   useEffect(() => {
     const saved = loadPlaylist();
+    const savedVolume = loadPlayerVolume();
     setTracks(saved.tracks);
     setMode(saved.mode);
     setCurrentId(saved.currentId);
+    setVolume(savedVolume);
+    rememberedVolume.current = savedVolume > 0 ? savedVolume : 30;
+    if (audioRef.current) audioRef.current.volume = savedVolume / 100;
   }, []);
 
   useEffect(() => {
@@ -100,6 +111,7 @@ export function VinylCard() {
     const url = URL.createObjectURL(file);
     urlRef.current = url;
     audio.src = url;
+    audio.volume = volumeRef.current / 100;
     setCurrentId(id);
     setProgress(0);
     const next = {
@@ -191,6 +203,29 @@ export function VinylCard() {
     }
   }
 
+  function applyVolume(next: number) {
+    const level = Math.min(100, Math.max(0, Math.round(next)));
+    setVolume(level);
+    savePlayerVolume(level);
+    if (level > 0) {
+      setMuted(false);
+      rememberedVolume.current = level;
+    } else {
+      setMuted(true);
+    }
+    if (audioRef.current) audioRef.current.volume = level / 100;
+  }
+
+  function toggleMute() {
+    if (muted || volume === 0) {
+      applyVolume(rememberedVolume.current || 30);
+      return;
+    }
+    rememberedVolume.current = volume;
+    setMuted(true);
+    if (audioRef.current) audioRef.current.volume = 0;
+  }
+
   function cycleMode() {
     const mode = nextMode(modeRef.current);
     setMode(mode);
@@ -271,6 +306,27 @@ export function VinylCard() {
         >
           <ModeIcon mode={mode} />
         </button>
+        <div className="ml-2 flex shrink-0 flex-row flex-nowrap items-center gap-2 whitespace-nowrap">
+          <button
+            type="button"
+            aria-label={muted || volume === 0 ? "恢复音量" : "静音"}
+            aria-pressed={muted || volume === 0}
+            onClick={toggleMute}
+            className={controlClass}
+          >
+            {muted || volume === 0 ? <VolumeOffIcon /> : <VolumeIcon />}
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={muted ? 0 : volume}
+            aria-label="音量"
+            onChange={(event) => applyVolume(Number(event.target.value))}
+            className="w-24 shrink-0 accent-[#1E6B48]"
+          />
+        </div>
       </div>
       <ul className="song-scroll mt-5 max-h-52 min-h-28 flex-1 space-y-1 overflow-y-auto text-sm">
         {tracks.length === 0 ? (
@@ -305,6 +361,30 @@ export function VinylCard() {
 
 const controlClass =
   "inline-flex h-10 w-10 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[var(--chip)] transition-all duration-300 hover:opacity-80";
+
+function VolumeIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M2.5 6.2h2.2L8 3.4v9.2L4.7 9.8H2.5V6.2z" fill="currentColor" />
+      <path
+        d="M10 6.1a2.6 2.6 0 0 1 0 3.8M11.6 4.6a4.6 4.6 0 0 1 0 6.8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function VolumeOffIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M2.5 6.2h2.2L8 3.4v9.2L4.7 9.8H2.5V6.2z" fill="currentColor" />
+      <path d="M10.2 6.2 13.8 9.8M13.8 6.2 10.2 9.8" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 function PlayIcon() {
   return (

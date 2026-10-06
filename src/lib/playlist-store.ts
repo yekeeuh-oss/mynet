@@ -12,6 +12,7 @@ export type PlaylistState = {
 };
 
 const playlistKey = "my-diary.playlist";
+const volumeKey = "my-diary.player-volume";
 
 const modes: PlayMode[] = ["single", "order", "shuffle"];
 
@@ -63,6 +64,26 @@ export function nextMode(mode: PlayMode): PlayMode {
   if (mode === "single") return "order";
   if (mode === "order") return "shuffle";
   return "single";
+}
+
+export function loadPlayerVolume() {
+  try {
+    const raw = localStorage.getItem(volumeKey);
+    if (raw === null) return 30;
+    const value = Number(raw);
+    if (!Number.isFinite(value)) return 30;
+    return Math.min(100, Math.max(0, Math.round(value)));
+  } catch {
+    return 30;
+  }
+}
+
+export function savePlayerVolume(volume: number) {
+  try {
+    localStorage.setItem(volumeKey, String(Math.min(100, Math.max(0, Math.round(volume)))));
+  } catch {
+    /* Ignore quota and private-mode failures. */
+  }
 }
 
 export function modeLabel(mode: PlayMode) {
